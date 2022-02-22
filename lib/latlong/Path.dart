@@ -42,7 +42,7 @@ LatLng _defaultLatLngFactory(final double latitude, final double longitude) =>
 ///
 ///     final Path<Location> path = new Path<Location>(factory: locationFactory);
 ///
-class Path<T extends LatLng> {
+class Path<T extends LatLng?> {
   final Logger _logger = new Logger('latlong.Path');
 
   /// Coordinates managed by this class
@@ -60,9 +60,7 @@ class Path<T extends LatLng> {
   Path.from(final Iterable<T> coordinates,
       {final LatLngFactory factory: _defaultLatLngFactory})
       : _coordinates = new List<T>.from(coordinates),
-        _latLngFactory = factory {
-    Validate.notNull(coordinates);
-  }
+        _latLngFactory = factory {}
 
   List<T> get coordinates => _coordinates;
 
@@ -71,13 +69,12 @@ class Path<T extends LatLng> {
 
   /// Add new [T] coordinate to path
   void add(final T value) {
-    Validate.notNull(value);
+    assert(value != null);
     return _coordinates.add(value);
   }
 
   /// Add all coordinates from [List<T>] to path
   void addAll(final List<T> values) {
-    Validate.notNull(values);
     return _coordinates.addAll(values);
   }
 
@@ -99,9 +96,8 @@ class Path<T extends LatLng> {
   /// we need two
   Path equalize(final num distanceInMeterPerTime,
       {final bool smoothPath: true}) {
-    Validate.isTrue(
-        distanceInMeterPerTime > 0, "Distance must be greater than 0");
-    Validate.isTrue(
+    assert(distanceInMeterPerTime > 0, "Distance must be greater than 0");
+    assert(
         (smoothPath && _coordinates.length >= 3) ||
             (!smoothPath && _coordinates.length >= 2),
         "At least ${smoothPath ? 3 : 2} coordinates are needed to create the steps in between");
@@ -112,8 +108,8 @@ class Path<T extends LatLng> {
         ? distanceInMeterPerTime * 2.0
         : distanceInMeterPerTime.toDouble();
 
-    final double baseLength = distance;
-    Validate.isTrue(baseLength >= stepDistance,
+    final double baseLength = distance as double;
+    assert(baseLength >= stepDistance,
         "Path distance must be at least ${stepDistance}mn (step distance) but was ${baseLength}");
 
     if (stepDistance > baseLength / 2) {
@@ -138,11 +134,12 @@ class Path<T extends LatLng> {
 
     for (int index = 0; index < coordinates.length - 1; index++) {
       final double distance =
-          _distance(tempCoordinates[index], tempCoordinates[index + 1]);
+          _distance(tempCoordinates[index]!, tempCoordinates[index + 1]!)
+              as double;
 
       // Remember the direction
-      bearing =
-          _distance.bearing(tempCoordinates[index], tempCoordinates[index + 1]);
+      bearing = _distance.bearing(
+          tempCoordinates[index]!, tempCoordinates[index + 1]!);
 
       if (remainingSteps <= distance ||
           (stepDistance - remainingSteps) <= distance) {
@@ -173,14 +170,14 @@ class Path<T extends LatLng> {
             CatmullRomSpline2D<double> spline;
 
             if (path.nrOfCoordinates == 3) {
-              spline = _createSpline(path[0], path[0], path[1], path[2]);
+              spline = _createSpline(path[0]!, path[0]!, path[1]!, path[2]!);
 
               // Insert new point between 0 and 1
               path.coordinates.insert(1, _pointToLatLng(spline.percentage(50)));
             } else if (path.nrOfCoordinates > 3) {
               final int baseIndex = path.nrOfCoordinates - 1;
-              spline = _createSpline(path[baseIndex - 3], path[baseIndex - 2],
-                  path[baseIndex - 1], path[baseIndex]);
+              spline = _createSpline(path[baseIndex - 3]!, path[baseIndex - 2]!,
+                  path[baseIndex - 1]!, path[baseIndex]!);
 
               // Insert new point at last position - 2 (pushes the next 2 items down)
               path.coordinates
@@ -195,9 +192,9 @@ class Path<T extends LatLng> {
 
     // If last step is on the same position as the last generated step
     // then don't add the last base step.
-    if (baseStep.round() != tempCoordinates.last.round() &&
-        baseStep.round() != tempCoordinates.first.round() &&
-        round(_distance(baseStep, tempCoordinates.last)) > 1) {
+    if (baseStep!.round() != tempCoordinates.last!.round() &&
+        baseStep.round() != tempCoordinates.first!.round() &&
+        round(_distance(baseStep, tempCoordinates.last!) as double) > 1) {
       path.add(tempCoordinates.last);
     }
 
@@ -206,10 +203,10 @@ class Path<T extends LatLng> {
       int baseIndex = path.nrOfCoordinates - 1;
       if (baseIndex > 3) {
         final CatmullRomSpline2D<double> spline = _createSpline(
-            path[baseIndex - 3],
-            path[baseIndex - 2],
-            path[baseIndex - 1],
-            path[baseIndex - 0]);
+            path[baseIndex - 3]!,
+            path[baseIndex - 2]!,
+            path[baseIndex - 1]!,
+            path[baseIndex - 0]!);
 
         path.coordinates
             .insert(baseIndex - 1, _pointToLatLng(spline.percentage(50)));
@@ -218,12 +215,12 @@ class Path<T extends LatLng> {
       // Check if there is a remaining gap between the last two elements - close it
       // Could be because of reminder from path divisions
       baseIndex = path.nrOfCoordinates - 1;
-      if (_distance(path[baseIndex - 1], path[baseIndex]) >= stepDistance) {
+      if (_distance(path[baseIndex - 1]!, path[baseIndex]!)! >= stepDistance) {
         final CatmullRomSpline2D<double> spline = _createSpline(
-            path[baseIndex - 1],
-            path[baseIndex - 1],
-            path[baseIndex - 0],
-            path[baseIndex - 0]);
+            path[baseIndex - 1]!,
+            path[baseIndex - 1]!,
+            path[baseIndex - 0]!,
+            path[baseIndex - 0]!);
 
         path.coordinates
             .insert(baseIndex, _pointToLatLng(spline.percentage(50)));
@@ -245,7 +242,8 @@ class Path<T extends LatLng> {
     double length = 0.0;
 
     for (int index = 0; index < coordinates.length - 1; index++) {
-      length += _distance(tempCoordinates[index], tempCoordinates[index + 1]);
+      length +=
+          _distance(tempCoordinates[index]!, tempCoordinates[index + 1]!)!;
     }
     return round(length);
   }
@@ -254,7 +252,7 @@ class Path<T extends LatLng> {
   ///
   /// The function rounds the result to 6 decimals
   LatLng get center {
-    Validate.notEmpty(coordinates, "Coordinates must not be empty!");
+    assert(coordinates.isNotEmpty, "Coordinates must not be empty!");
 
     double X = 0.0;
     double Y = 0.0;
@@ -263,7 +261,7 @@ class Path<T extends LatLng> {
     double lat, lon, hyp;
 
     coordinates.forEach((final T coordinate) {
-      lat = coordinate.latitudeInRad;
+      lat = coordinate!.latitudeInRad;
       lon = coordinate.longitudeInRad;
 
       X += math.cos(lat) * math.cos(lon);
@@ -302,11 +300,6 @@ class Path<T extends LatLng> {
   /// 4 Points are necessary to create a [CatmullRomSpline2D]
   CatmullRomSpline2D<double> _createSpline(
       final LatLng p0, final LatLng p1, final LatLng p2, final LatLng p3) {
-    Validate.notNull(p0);
-    Validate.notNull(p1);
-    Validate.notNull(p2);
-    Validate.notNull(p3);
-
     return new CatmullRomSpline2D(
         new Point2D(p0.latitude, p0.longitude),
         new Point2D(p1.latitude, p1.longitude),
@@ -316,5 +309,5 @@ class Path<T extends LatLng> {
 
   /// Convert [Point2D] to [LatLng]
   LatLng _pointToLatLng(final Point2D point) =>
-      _latLngFactory(point.x, point.y);
+      _latLngFactory(point.x as double, point.y as double);
 }

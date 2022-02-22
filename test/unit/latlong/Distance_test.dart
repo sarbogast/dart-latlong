@@ -35,9 +35,9 @@ main() {
             final LatLng p2 = new LatLng(90.0, 0.0);
 
             // no rounding
-            expect(distance(p1, p2) ~/ 1000 , equals(10001));
+            expect(distance(p1, p2)! ~/ 1000 , equals(10001));
 
-            expect(LengthUnit.Meter.to(LengthUnit.Kilometer,distance(p1, p2)).round(), equals(10002));
+            expect(LengthUnit.Meter.to(LengthUnit.Kilometer,distance(p1, p2))!.round(), equals(10002));
 
             // rounds to 10002
             expect(distance.as(LengthUnit.Kilometer,p1, p2), equals(10002));

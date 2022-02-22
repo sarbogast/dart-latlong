@@ -422,12 +422,6 @@
       "languageVersion": "2.12"
     },
     {
-      "name": "validate",
-      "rootUri": "file:///Users/sarbogast/.pub-cache/hosted/pub.dartlang.org/validate-1.7.0",
-      "packageUri": "lib/",
-      "languageVersion": "2.0"
-    },
-    {
       "name": "vm_service",
       "rootUri": "file:///Users/sarbogast/.pub-cache/hosted/pub.dartlang.org/vm_service-8.1.0",
       "packageUri": "lib/",
@@ -461,10 +455,10 @@
       "name": "latlong",
       "rootUri": "../",
       "packageUri": "lib/",
-      "languageVersion": "2.0"
+      "languageVersion": "2.12"
     }
   ],
-  "generated": "2022-02-22T16:05:03.297460Z",
+  "generated": "2022-02-22T16:27:35.844059Z",
   "generator": "pub",
   "generatorVersion": "2.16.1"
 }

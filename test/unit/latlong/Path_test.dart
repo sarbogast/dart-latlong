@@ -119,7 +119,7 @@ main() {
             //_exportForGoogleEarth(steps);
             for(int index = 0;index < steps.nrOfCoordinates - 1;index++) {
                 // 46?????
-                expect(distance(steps[index],steps[index + 1]), inInclusiveRange(46,112));
+                expect(distance(steps[index]!,steps[index + 1]!), inInclusiveRange(46,112));
             }
 
         }); // end of '10 intermediate steps in 1000m should have the same length' test
@@ -206,7 +206,7 @@ main() {
             final Path path = new Path.from(route);
 
             expect(round(
-                LengthUnit.Meter.to(LengthUnit.Kilometer,path.distance),decimals:3)
+                LengthUnit.Meter.to(LengthUnit.Kilometer,path.distance)!,decimals:3)
             ,3.377);
 
         }); // end of 'Path length should be 3.377km' test
@@ -257,10 +257,10 @@ void _exportForGoogleEarth(final Path steps, {final bool show: true }) {
 
         print("latitude,longitude,distance");
         for(int index = 0;index < steps.nrOfCoordinates - 1;index++) {
-            print("${steps[index].latitude}, ${steps[index].longitude}, ${distance(steps[index],steps[index+1])}");
+            print("${steps[index]!.latitude}, ${steps[index]!.longitude}, ${distance(steps[index]!,steps[index+1]!)}");
         }
 
-        print("${steps.last.latitude}, ${steps.last.longitude}, 0");
+        print("${steps.last!.latitude}, ${steps.last!.longitude}, 0");
     }
 
 }

@@ -30,13 +30,13 @@ class LengthUnit {
 
     const LengthUnit(this.scaleFactor);
 
-    double to(final LengthUnit unit,final num value) {
+    double? to(final LengthUnit unit,final num? value) {
         if(unit.scaleFactor == scaleFactor) {
-            return value;
+            return value as double?;
         }
 
         // Convert to primary unit.
-        final double primaryValue = value / scaleFactor;
+        final double primaryValue = value! / scaleFactor;
 
         // Convert to destination unit.
         return primaryValue * unit.scaleFactor;

@@ -44,7 +44,7 @@ main() async {
         }); // end of 'Kilometer' test
 
         test('> Mike', () {
-            expect((LengthUnit.Mile.to(LengthUnit.Meter, 1.0) * 100).round() / 100, 1609.34);
+            expect((LengthUnit.Mile.to(LengthUnit.Meter, 1.0)! * 100).round() / 100, 1609.34);
         }); // end of 'Mike' test
 
     });
